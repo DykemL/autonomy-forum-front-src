@@ -1,36 +1,97 @@
-import React, { useState } from 'react';
-import { Container, Box, Typography, TextField } from '@mui/material';
+import { FormEvent, useEffect, useState } from 'react';
+import { Container, Box, Typography, TextField, Alert, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+import { useField } from '../../Hooks/useField';
+import Api from '../../Api/Api';
+import { observer } from 'mobx-react-lite';
+import snackbarService from '../../Services/SnackbarService';
+import { useNavigate } from 'react-router-dom';
+import userService from '../../Services/UserService';
 
-class FormValidation {
-  hasNameErrors: boolean = false;
-  hasEmailErrors: boolean = false;
-  hasPasswordErrors: boolean = false;
-  hasPasswordRetypeErrors: boolean = false;
-}
+function Register() {
+  const userName = useField('', { isEmpty: true });
+  const email = useField('', { isEmpty: true });
+  const password = useField('', { isEmpty: true });
+  const passwordRetype = useField('', { isEmpty: true, sameValue: password.value });
 
-export default function Register() {
-  const [validation, setValidation] = useState<FormValidation>();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [wasSubmitted, setWasSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setWasSubmitted(false);
+    if (!wasSubmitted || !validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+    Api.auth.register({ userName: userName.value, email: email.value, password: password.value }).then(result => {
+      if (!result.ensureSuccess()) {
+        setLoading(false);
+        result.code && snackbarService.push(result.body?.message ?? 'Ошибка при регистрации', 'error');
+        return;
+      }
+
+      Api.auth.login({ userName: userName.value, password: password.value }).then(result => {
+        setLoading(false);
+        if (!result.ensureSuccess()) {
+          snackbarService.push('Ошибка при авторизации после успешной регистрации', 'error');
+          return;
+        }
+
+        snackbarService.push('Регистрация прошла успешно', 'success');
+        userService.updateAuthorizationState();
+        navigate('/');
+      });
+    });
+  }, [wasSubmitted])
+
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('userName'),
-      password: data.get('password'),
-    })
+    userName.startValidation();
+    email.startValidation();
+    password.startValidation();
+    passwordRetype.startValidation();
+    setWasSubmitted(true);
+  };
+
+  const validateForm = () : boolean => {
+    if (userName.validation.hasErrors || email.validation.hasErrors || password.validation.hasErrors || passwordRetype.validation.hasErrors) {
+      return false;
+    }
+
+    return true;
   }
 
   return (
     <Container component="main" maxWidth="xs">
       <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Typography component="h1" variant="h5">Регистрация</Typography>
-        <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          <TextField error={validation?.hasNameErrors} required fullWidth id="userName" name="userName" label="Логин" />
-          <TextField error={validation?.hasEmailErrors} required sx={{ mt: 2 }} fullWidth id="email" name="email" label="Email" />
-          <TextField error={validation?.hasPasswordErrors} required sx={{ mt: 2 }} fullWidth id="password" name="password" type="password" label="Пароль" />
-          <TextField error={validation?.hasPasswordRetypeErrors} required sx={{ mt: 2 }} fullWidth id="password-retype" name="password-retype" type="password" label="Повторите пароль" />
+        <Box component="form" noValidate onSubmit={onSubmit} sx={{ mt: 3, width: '100%' }}>
+          <Stack sx={{ width: '100%' }} spacing={2}>
+            <TextField id="userName" name="userName" label="Логин"
+              onChange={userName.onChange}
+              onBlur={() => userName.startValidation()}
+              error={userName.validation.hasErrors}
+              required fullWidth />
+            <TextField id="email" name="email" label="Email"
+              onChange={email.onChange}
+              onBlur={() => email.startValidation()}
+              error={email.validation.hasErrors}
+              required fullWidth />
+            <TextField id="password" name="password" type="password" label="Пароль"
+              onChange={password.onChange}
+              onBlur={() => password.startValidation()}
+              error={password.validation.hasErrors}
+              required fullWidth />
+            {!passwordRetype.validation.isSameValue && <Alert severity="error">Пароли должны совпадать</Alert>}
+            <TextField id="passwordRetype" name="passwordRetype" type="password" label='Повторите пароль'
+              onChange={passwordRetype.onChange}
+              onBlur={() => passwordRetype.startValidation()}
+              error={passwordRetype.validation.hasErrors}
+              required fullWidth />
+          </Stack>
           <LoadingButton loading={loading} type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
             Зарегистрироваться
           </LoadingButton>
@@ -39,3 +100,5 @@ export default function Register() {
     </Container>
   );
 }
+
+export default observer(Register);
