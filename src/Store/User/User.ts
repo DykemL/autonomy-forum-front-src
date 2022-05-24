@@ -1,7 +1,8 @@
-import { Nullable } from "../../Common/Types";
-import { Role } from "./UserRoles";
+import { Guid } from "../../Common/Types";
+import { Role } from "./Roles";
 
-export interface User {
-  userName: Nullable<string>;
-  roles: Role[];
+export interface JwtUser {
+  id?: Guid;
+  userName?: string;
+  roles?: Role[];
 }

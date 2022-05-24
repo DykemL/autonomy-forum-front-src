@@ -30,7 +30,7 @@ function Login() {
         return;
       }
 
-      userService.updateAuthorizationState();
+      userService.updateAuthorizationState(result.body!);
       navigate('/');
     });
   }, [wasSubmitted])

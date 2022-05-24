@@ -1,5 +1,5 @@
 import { AccountCircle, Logout } from "@mui/icons-material";
-import { IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
+import { Button, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import { useState } from "react";
 import { Nullable } from "../../Common/Types";
 import userService from "../../Services/UserService";
@@ -19,9 +19,9 @@ function AuthorizedHeaderBar () {
   return (
     <>
       <Tooltip title="Профиль">
-        <IconButton onClick={handleProfileClick} size="large" color="inherit">
-          <AccountCircle />
-        </IconButton>
+        <Button sx={{ textTransform: 'none' }} startIcon={<AccountCircle />} onClick={handleProfileClick} size="large" color="inherit">
+          {userService.getUserName()}
+        </Button>
       </Tooltip>
       <Menu
         anchorEl={profileMenuAnchorEl}

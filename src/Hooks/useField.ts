@@ -1,16 +1,18 @@
 import { ChangeEvent, useState } from "react";
+import { Nullable } from "../Common/Types";
 import { useValidation, ValidationResult as ValidationResult, ValidationRules } from "./useValidation";
 
 type OnChangeHandler = (event: ChangeEvent<HTMLInputElement>) => void;
 
 interface Field {
-  value: string;
+  value?: string;
   onChange: OnChangeHandler;
   startValidation: (isActive?: boolean) => void;
   validation: ValidationResult;
+  clear: () => void;
 }
 
-export function useField(defaultValue: string, rules: ValidationRules): Field {
+export function useField(defaultValue: Nullable<string> = undefined, rules: ValidationRules = {}): Field {
   const [value, setValue] = useState(defaultValue);
   const [isActiveInternal, setIsActiveInternal] = useState(false);
 
@@ -25,6 +27,7 @@ export function useField(defaultValue: string, rules: ValidationRules): Field {
       validation.forceValidate();
       setIsActiveInternal(true);
     },
-    validation: validation
+    validation: validation,
+    clear: () => setValue(defaultValue)
   });
 }

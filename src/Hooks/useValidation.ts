@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Nullable } from "../Common/Types";
 
 export interface ValidationRules {
   isEmpty?: boolean;
@@ -12,7 +13,7 @@ export interface ValidationResult {
   forceValidate: () => void; 
 }
 
-export function useValidation(value: string, rules: ValidationRules, isActive: boolean = true): ValidationResult {
+export function useValidation(value: Nullable<string>, rules: ValidationRules, isActive: boolean = true): ValidationResult {
   const [isEmpty, setIsEmpty] = useState(false);
   const [isSameValue, setIsSameValue] = useState(true);
 

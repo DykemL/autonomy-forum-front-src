@@ -16,16 +16,44 @@ export class RequestResult<TBody = undefined> {
 
 const REQUEST_FAILED: string = 'Failed to fetch';
 
-class ApiClientImpl {
+class ApiClient {
   private apiUrl: string;
-  private timeout: number = 5000;
+  private timeout: number = 10000;
 
   constructor() {
     this.apiUrl = process.env.REACT_APP_API_URL!;
   }
 
-  async post<TResultBody, TRequestBody>(path: string, body: TRequestBody): Promise<RequestResult<TResultBody>> {
+  async post<TResultBody, TRequestBody>(path: string, body?: TRequestBody): Promise<RequestResult<TResultBody>> {
     return await this.send(`${this.apiUrl}/${path}`, 'post', body);
+  }
+
+  async get<TResultBody>(path: string, parameter?: string): Promise<RequestResult<TResultBody>> {
+    let url = `${this.apiUrl}/${path}`;
+    if (parameter !== undefined) {
+      url = url + '/' + parameter
+    }
+    return await this.send(url, 'get');
+  }
+
+  async put<TResultBody, TRequestBody>(path: string, body?: TRequestBody): Promise<RequestResult<TResultBody>> {
+    return await this.send(`${this.apiUrl}/${path}`, 'put', body);
+  }
+
+  async delete<TResultBody>(path: string, parameter?: string): Promise<RequestResult<TResultBody>> {
+    let url = `${this.apiUrl}/${path}`;
+    if (parameter !== undefined) {
+      url = url + '/' + parameter
+    }
+    return await this.send(url, 'delete');
+  }
+
+  async patch<TResultBody, TRequestBody>(path: string, parameter?: string, body?: TRequestBody): Promise<RequestResult<TResultBody>> {
+    let url = `${this.apiUrl}/${path}`;
+    if (parameter !== undefined) {
+      url = url + '/' + parameter
+    }
+    return await this.send(url, 'patch', body);
   }
 
   private async send<TResultBody, TRequestBody>(path: string, method: string, body?: TRequestBody): Promise<RequestResult<TResultBody>> {
@@ -44,7 +72,7 @@ class ApiClientImpl {
 
     const result = await fetch(request).catch(error => {
       if (error?.message === REQUEST_FAILED) {
-        snackbarService.push('Ошибка при выполнении запроса', 'error');
+        snackbarService.push('Ошибка соединения с сервером', 'error');
       }
 
       return;
@@ -58,5 +86,5 @@ class ApiClientImpl {
   }
 }
 
-const ApiClient = new ApiClientImpl();
-export default ApiClient;
+const apiClient = new ApiClient();
+export default apiClient;

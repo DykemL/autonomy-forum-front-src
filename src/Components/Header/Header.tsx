@@ -10,8 +10,8 @@ function Header() {
     <AppBar position="static">
       <Toolbar>
         <Box sx={{ flexGrow: 1 }}>
-          <Typography sx={{ p: 1 }} component={ClearLink} to="/" variant="h6">
-            Autonomy forum
+          <Typography sx={{ p: 1 }} component={ClearLink} to="/" variant="h6" fontFamily="cursive">
+            Autonomy Forum
           </Typography>
         </Box>
         { userService.isAuthorized() ? <AuthorizedHeaderBar /> : <NonAuthorizedHeaderBar /> }

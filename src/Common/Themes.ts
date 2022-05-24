@@ -6,5 +6,8 @@ export const createMainTheme = () => createTheme({
     primary: {
       main: blue[900],
     },
+    secondary: {
+      main: blue[500]
+    }
   },
 });

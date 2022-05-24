@@ -1,9 +1,10 @@
+import { UserExtended } from './../../Api/Contracts/Common';
 import { action, makeAutoObservable } from "mobx";
 import { Nullable } from "../../Common/Types";
 
 class UserStore {
   private _isAuthorized: boolean = false;
-  private _userName?: string;
+  private _user?: UserExtended;
 
   constructor() {
     makeAutoObservable(this);
@@ -13,18 +14,18 @@ class UserStore {
     return this._isAuthorized;
   }
 
-  get userName(): Nullable<string> {
-    return this._userName;
+  get user(): Nullable<UserExtended> {
+    return this._user;
   }
 
-  set userName(userName: Nullable<string>) {
-    this._userName = userName;
-    this._isAuthorized = this._userName === undefined ? false : true;
+  set user(user: Nullable<UserExtended>) {
+    this._user = user;
+    this._isAuthorized = this._user === undefined ? false : true;
   }
 
   clear() {
     this._isAuthorized = false;
-    this._userName = undefined;
+    this._user = undefined;
   }
 }
 
