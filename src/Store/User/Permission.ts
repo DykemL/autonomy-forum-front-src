@@ -1,5 +1,6 @@
 export type Permission =
 'ban' |
+'set-moderator' |
 
 'create-section' |
 'modify-section' |

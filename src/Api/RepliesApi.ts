@@ -8,14 +8,14 @@ export default class RepliesApi {
       message: message,
       topicId: topicId
     }
-    return await ApiClient.put('Replies', request);
+    return await ApiClient.put('replies', request);
   }
 
   async deleteReply(replyId: Guid): Promise<RequestResult> {
-    return await ApiClient.delete('Replies', replyId);
+    return await ApiClient.delete('replies', replyId);
   }
 
   async doLikeReply(replyId: Guid): Promise<RequestResult> {
-    return await ApiClient.patch('Replies/Like', replyId);
+    return await ApiClient.post('replies/'+ replyId +'/like');
   }
 }

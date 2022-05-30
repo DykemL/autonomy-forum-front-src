@@ -41,7 +41,7 @@ function Register() {
         }
 
         snackbarService.push('Регистрация прошла успешно', 'success');
-        userService.updateAuthorizationState(result.body!);
+        userService.login(result.body!);
         navigate('/');
       });
     });

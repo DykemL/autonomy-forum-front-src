@@ -26,11 +26,15 @@ function Login() {
     Api.auth.login({ userName: userName.value, password: password.value }).then(result => {
       setLoading(false);
       if (!result.ensureSuccess()) {
+        if (result.code == 403) {
+          snackbarService.push('Вы заблокированы', 'error');
+          return;
+        }
         snackbarService.push('Ошибка авторизации', 'error');
         return;
       }
 
-      userService.updateAuthorizationState(result.body!);
+      userService.login(result.body!);
       navigate('/');
     });
   }, [wasSubmitted])

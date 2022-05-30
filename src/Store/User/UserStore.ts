@@ -1,10 +1,11 @@
 import { UserExtended } from './../../Api/Contracts/Common';
-import { action, makeAutoObservable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { Nullable } from "../../Common/Types";
 
 class UserStore {
   private _isAuthorized: boolean = false;
   private _user?: UserExtended;
+  private _isUpdateInProgress: boolean = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -21,6 +22,14 @@ class UserStore {
   set user(user: Nullable<UserExtended>) {
     this._user = user;
     this._isAuthorized = this._user === undefined ? false : true;
+  }
+
+  get isUpdateInProgress(): boolean {
+    return this._isUpdateInProgress;
+  }
+
+  set isUpdateInProgress(isInProgress: boolean) {
+    this._isUpdateInProgress = isInProgress;
   }
 
   clear() {

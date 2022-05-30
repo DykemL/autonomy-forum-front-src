@@ -8,18 +8,18 @@ export default class SectionsApi {
       title: title,
       description: description
     }
-    return await ApiClient.put('Sections', request);
+    return await ApiClient.put('sections', request);
   }
 
   async getSections(): Promise<RequestResult<Section[]>> {
-    return await ApiClient.get('Sections');
+    return await ApiClient.get('sections');
   }
 
   async getSectionById(sectionId: Guid): Promise<RequestResult<Section>> {
-    return await ApiClient.get('Sections', sectionId);
+    return await ApiClient.get('sections', sectionId);
   }
 
   async deleteSection(sectionId: Guid): Promise<RequestResult> {
-    return await ApiClient.delete('Sections', sectionId);
+    return await ApiClient.delete('sections', sectionId);
   }
 }

@@ -98,9 +98,9 @@ function Forum() {
 
       <CreateSectionDialog isOpen={isCreateSectionDialogOpen} onClose={() => setIsCreateSectionDialogOpen(false)} />
       <ConfirmDialog message="Вы уверены?" agreeMessage="Удалить"
-      isOpen={isDeleteSectionOpen}
-      close={() => setIsDeleteSectionOpen(false)}
-      onAgree={() => deleteSection()} />
+        isOpen={isDeleteSectionOpen}
+        close={() => setIsDeleteSectionOpen(false)}
+        onAgree={() => deleteSection()} />
     </>
     :
     <BaseProgress />

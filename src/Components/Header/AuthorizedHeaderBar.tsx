@@ -1,10 +1,13 @@
 import { AccountCircle, Logout } from "@mui/icons-material";
 import { Button, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Nullable } from "../../Common/Types";
 import userService from "../../Services/UserService";
 
 function AuthorizedHeaderBar () {
+  const navigate = useNavigate();
+
   const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState<Nullable<HTMLElement>>(undefined);
   const isProfileMenuOpen = Boolean(profileMenuAnchorEl);
 
@@ -31,7 +34,10 @@ function AuthorizedHeaderBar () {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem onClick={closeProfileMenu}>Профиль</MenuItem>
+        <MenuItem onClick={() => {
+          closeProfileMenu();
+          navigate('/users/' + userService.getUserId());
+        }}>Профиль</MenuItem>
         <MenuItem onClick={() => {
             closeProfileMenu();
             userService.logout();

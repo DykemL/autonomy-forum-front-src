@@ -15,7 +15,7 @@ function App() {
 
   useEffect(() => {
     setLoading(true);
-    userService.updateAuthorizationStateFromServer().then(() => {
+    userService.updateAuthorizationState().then(() => {
       setLoading(false);
     });
   }, []);
@@ -24,7 +24,7 @@ function App() {
     <ThemeProvider theme={mainTheme}>
       {snackbarService.getContainer()}
       {!loading ?
-        <BrowserRouter>
+        <BrowserRouter basename={`/${process.env.PUBLIC_URL}`}>
           <AppRouter />
         </BrowserRouter>
         :

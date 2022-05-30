@@ -1,6 +1,7 @@
 {
-  "name": "autonomy-forum-front",
+  "name": "AutonomyForumFront",
   "version": "0.1.0",
+  "homepage": "https://dykeml.github.io/AutonomyForumFront",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.9.0",
@@ -12,6 +13,7 @@
     "@types/node": "^16.11.27",
     "@types/react": "^18.0.5",
     "@types/react-dom": "^18.0.1",
+    "gh-pages": "^4.0.0",
     "json2typescript": "^1.5.0",
     "jwt-decode": "^3.1.2",
     "mobx": "^6.5.0",
@@ -29,6 +31,8 @@
     "@types/jsonwebtoken": "^8.5.8"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

@@ -1,42 +1,38 @@
 import { Permission } from './../Store/User/Permission';
 import { UserExtended } from './../Api/Contracts/Common';
-import { getUser, isNeededToRefresh, removeJwt } from "../Common/Helpers/JwtHelper";
 import userStore from "../Store/User/UserStore";
 import Api from '../Api/Api';
-import snackbarService from './SnackbarService';
 import { Guid, Nullable } from '../Common/Types';
+import { isLogout, setLogout } from '../Common/Helpers/JwtHelper';
 
 class UserService {
-  updateAuthorizationState(user?: UserExtended) {
+  login(user?: UserExtended) {
+    setLogout(false);
     userStore.user = user;
   }
 
-  async updateAuthorizationStateFromServer(): Promise<void> {
-    const isNeededToRefreshValue = isNeededToRefresh();
-    if (isNeededToRefreshValue) {
+  async updateAuthorizationState(): Promise<void> {
+    if (userStore.isUpdateInProgress || isLogout()) {
+      return;
+    }
+    userStore.isUpdateInProgress = true;
+    const result = await Api.auth.current();
+    if (!result.ensureSuccess()) {
+      //snackbarService.push('Произошла ошибка авторизации', 'warning');
       const result = await Api.auth.refresh();
       if (!result.ensureSuccess()) {
         //snackbarService.push('Произошла ошибка авторизации', 'error')
         this.logout();
+        userStore.isUpdateInProgress = false;
         return;
       }
-      this.updateAuthorizationState(result.body);
+      this.login(result.body);
+      userStore.isUpdateInProgress = false;
       return;
     }
 
-    const user = getUser();
-    if (user === undefined) {
-      return;
-    }
-
-    const result = await Api.auth.current();
-    if (!result.ensureSuccess()) {
-      //snackbarService.push('Произошла ошибка авторизации', 'warning');
-      this.logout();
-      return;
-    }
-
-    this.updateAuthorizationState(result.body);
+    this.login(result.body);
+    userStore.isUpdateInProgress = false;
   }
 
   checkPermission(permission: Permission): boolean {
@@ -47,8 +43,12 @@ class UserService {
   }
 
   logout(): void {
-    removeJwt();
+    setLogout(true);
     userStore.clear();
+  }
+
+  prepareLogin(): void {
+    setLogout(false);
   }
 
   getUserName(): Nullable<string> {

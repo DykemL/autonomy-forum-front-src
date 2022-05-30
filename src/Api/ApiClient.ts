@@ -1,6 +1,7 @@
 import process from 'process'
 import { Nullable } from '../Common/Types';
 import snackbarService from '../Services/SnackbarService';
+import userService from '../Services/UserService';
 
 export class RequestResult<TBody = undefined> {
   code?: number;
@@ -48,15 +49,13 @@ class ApiClient {
     return await this.send(url, 'delete');
   }
 
-  async patch<TResultBody, TRequestBody>(path: string, parameter?: string, body?: TRequestBody): Promise<RequestResult<TResultBody>> {
+  async patch<TResultBody, TRequestBody>(path: string, body?: TRequestBody): Promise<RequestResult<TResultBody>> {
     let url = `${this.apiUrl}/${path}`;
-    if (parameter !== undefined) {
-      url = url + '/' + parameter
-    }
     return await this.send(url, 'patch', body);
   }
 
   private async send<TResultBody, TRequestBody>(path: string, method: string, body?: TRequestBody): Promise<RequestResult<TResultBody>> {
+    await userService.updateAuthorizationState();
     const controller = new AbortController();
     setTimeout(() => controller.abort(), this.timeout);
     const request = new Request(path, {
@@ -82,6 +81,9 @@ class ApiClient {
     try {
       resultBody = result && await result.json();
     } catch {}
+    if (result?.status == 403) {
+      snackbarService.push('Недостаточно прав для выполнения действия', 'warning');
+    }
     return new RequestResult<TResultBody>(result?.status, resultBody);
   }
 }

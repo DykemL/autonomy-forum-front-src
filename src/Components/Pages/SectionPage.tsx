@@ -1,28 +1,34 @@
-import { Add as AddIcon, ExpandLess, ExpandMore, Feed as FeedIcon, Person, Search } from "@mui/icons-material";
+import { Add as AddIcon, Delete, ExpandLess, ExpandMore, Feed as FeedIcon, Person, Search } from "@mui/icons-material";
 import { Box, CircularProgress, Container, Divider, Fab, Grid, InputAdornment, Paper, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import { observer } from "mobx-react-lite";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import Api from "../../Api/Api";
 import { Section } from "../../Api/Contracts/Sections";
 import { Topic } from "../../Api/Contracts/Topics";
+import { Nullable, Guid } from "../../Common/Types";
 import { useField } from "../../Hooks/useField";
 import snackbarService from "../../Services/SnackbarService";
+import userService from "../../Services/UserService";
 import BaseProgress from "../Common/BaseProgress";
 import SearchField from "../Common/SearchField";
 import SimpleLink from "../Common/SimpleLink";
+import ConfirmDialog from "../Modals/ConfirmDialog";
 import CreateTopicDialog from "../Modals/CreateTopicDialog";
 
 function SectionPage() {
   const [loading, setLoading] = useState(true);
   const {sectionId} = useParams();
-  const [section, setSection] = useState<Section>()
+  const [section, setSection] = useState<Nullable<Section>>(undefined)
 
   const [isCreateDialog, setIsCreateDialog] = useState(false);
 
   const filter = useField(undefined);
 
   useEffect(() => {
+    if (section !== undefined) {
+      return;
+    }
     setLoading(true);
 
     Api.sections.getSectionById(sectionId!).then(result => {
@@ -34,8 +40,28 @@ function SectionPage() {
       setSection(result.body);
       setLoading(false);
     });
-  }, [isCreateDialog]);
+  });
 
+  const [isDeleteTopicOpen, setIsDeleteTopicOpen] = useState(false);
+  const [isDeleteTopic, setIsDeleteTopic] = useState(false);
+  const currentTopicId = useRef<Nullable<Guid>>();
+  const deleteTopic = async () => {
+    setLoading(true);
+    if (isDeleteTopic) {
+      return;
+    }
+
+    setIsDeleteTopic(true);
+    const result = await Api.topics.deleteTopic(currentTopicId.current!);
+    if (!result.ensureSuccess()) {
+      snackbarService.push('Ошибка при удалении темы', 'error');
+    }
+    setIsDeleteTopic(false);
+    setSection(undefined);
+    setLoading(false);
+  }
+
+  const hasDeleteTopicPermission = userService.checkPermission('delete-topic');
   const buildTopic = (topic: Topic): any => {
     const creationDate = new Date(topic.creationDateTime!);
 
@@ -54,6 +80,19 @@ function SectionPage() {
           <Grid item xs={2}>
             <Typography variant="body2">{creationDate.toLocaleString()}</Typography>
           </Grid>
+          {hasDeleteTopicPermission &&
+            <Grid item sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end' }} xs={1}>
+              <Tooltip title='Удалить тему'>
+                <Fab onClick={() => {
+                  currentTopicId.current = topic.id;
+                  setIsDeleteTopicOpen(true);
+                }} 
+                sx={{ ml: 2 }} color="error" size="small">
+                  <Delete />
+                </Fab>
+              </Tooltip>
+            </Grid>
+          }
         </Grid>
       </Paper>
     )
@@ -83,7 +122,14 @@ function SectionPage() {
           {topics?.map(topic => buildTopic(topic))}
         </Stack>
       </Container>
-      <CreateTopicDialog isOpen={isCreateDialog} onClose={() => setIsCreateDialog(false)} sectionId={sectionId!} />     
+      <CreateTopicDialog isOpen={isCreateDialog} onClose={() => {
+        setIsCreateDialog(false);
+        setSection(undefined);
+      }} sectionId={sectionId!} />    
+      <ConfirmDialog message="Вы уверены?" agreeMessage="Удалить"
+        isOpen={isDeleteTopicOpen}
+        close={() => setIsDeleteTopicOpen(false)}
+        onAgree={() => deleteTopic()} /> 
     </>
     :
     <BaseProgress />
