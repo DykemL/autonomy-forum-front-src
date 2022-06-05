@@ -1,11 +1,12 @@
 import { Add as AddIcon, Delete, ExpandLess, ExpandMore, Feed as FeedIcon, Person, Search } from "@mui/icons-material";
-import { Box, CircularProgress, Container, Divider, Fab, Grid, InputAdornment, Paper, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import { Avatar, Box, CircularProgress, Container, Divider, Fab, Grid, InputAdornment, Paper, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import Api from "../../Api/Api";
 import { Section } from "../../Api/Contracts/Sections";
 import { Topic } from "../../Api/Contracts/Topics";
+import { getFilePath } from "../../Common/Helpers/WebFilesHelper";
 import { Nullable, Guid } from "../../Common/Types";
 import { useField } from "../../Hooks/useField";
 import snackbarService from "../../Services/SnackbarService";
@@ -64,12 +65,12 @@ function SectionPage() {
   const hasDeleteTopicPermission = userService.checkPermission('delete-topic');
   const buildTopic = (topic: Topic): any => {
     const creationDate = new Date(topic.creationDateTime!);
-
+    const avatarWebPath = getFilePath(topic.author?.avatarFilePath);
     return (
       <Paper sx={{ mt: 2, p: 1 }} elevation={2}>
         <Grid columns={14} container direction="row" columnSpacing={1}>
           <Grid item xs={2} sx={{ display: 'inline-flex', alignItems: 'center', flexWrap: 'wrap' }}>
-            <Person sx={{ mr: 1 }} />
+          <Avatar src={avatarWebPath} sx={{ width: 32, height: 32, mr: 1 }}></Avatar>
             <SimpleLink to={"/users/" + topic?.author?.id}>
               {topic.author?.userName}
             </SimpleLink>

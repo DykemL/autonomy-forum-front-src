@@ -1,5 +1,5 @@
 import { LoadingButton } from '@mui/lab';
-import { Box, Container, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Container, Stack, TextField, Typography } from '@mui/material';
 import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Api from '../../Api/Api';
@@ -7,9 +7,9 @@ import { useField } from '../../Hooks/useField';
 import snackbarService from '../../Services/SnackbarService';
 import userService from '../../Services/UserService';
 
-function Login() {
-  const userName = useField('', { isEmpty: true });
-  const password = useField('', { isEmpty: true });
+function LoginPage() {
+  const userName = useField('', { isNotEmpty: true });
+  const password = useField('', { isNotEmpty: true });
 
   const [wasSubmitted, setWasSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -80,4 +80,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default LoginPage;

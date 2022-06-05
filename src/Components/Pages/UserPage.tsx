@@ -1,14 +1,16 @@
 import { AddModerator, Block, Upgrade } from "@mui/icons-material";
-import { Box, Button, Container, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Avatar, Box, Button, Container, Stack, Typography } from "@mui/material";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Api from "../../Api/Api";
 import { UserExtended } from "../../Api/Contracts/Common";
+import { getFilePath } from "../../Common/Helpers/WebFilesHelper";
 import { Guid, Nullable } from "../../Common/Types";
 import snackbarService from "../../Services/SnackbarService";
 import userService from "../../Services/UserService";
 import { localizeRole, Role } from "../../Store/User/Roles";
 import BaseProgress from "../Common/BaseProgress";
+import ImageSelector from "../Common/ImageSelector";
 
 function UserPage() {
   const [loading, setLoading] = useState(true);
@@ -64,6 +66,15 @@ function UserPage() {
   const canSetModerator = userService.checkPermission('set-moderator');
   const alreadyIsModerator = user?.roles?.includes('Moderator');
 
+  const onAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    let formData = new FormData();
+    formData.append("file", event.target!.files![0]);
+    let result = await Api.files.upload(formData);
+    await Api.users.attachAvatar(result.body?.id!);
+    setUser(undefined);
+  }
+  const avatarWebPath = getFilePath(user?.avatarFilePath);
+
   const createRoleLine = (role: string) => {
     return (
       <Typography color="orange" variant="subtitle1">
@@ -74,13 +85,11 @@ function UserPage() {
   return(!loading ?
     <Container sx={{ p: 2 }}>
       <Stack spacing={1} sx={{ maxWidth: "fit-content" }}>
-        {false && isMyProfile &&
+        <Avatar src={avatarWebPath} sx={{ width: 128, height: 128 }}></Avatar>
+        {isMyProfile &&
           <Box sx={{ mb: 2 }}>
             <Typography variant="h5" fontFamily="cursive">Ваш профиль</Typography>
-            <Button sx={{ mt: 1 }} variant="contained" component="label">
-              Загрузить аватар
-              <input type="file" accept=".png,.jpg,.bmp" hidden />
-            </Button>
+            <ImageSelector title="Загрузить аватар" changeHandler={onAvatarChange} sx={{ mt: 1 }} />
           </Box>
         }
         <Box>

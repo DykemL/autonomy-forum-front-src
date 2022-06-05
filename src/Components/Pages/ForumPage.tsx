@@ -1,5 +1,5 @@
 import { Box, Container, Fab, Grid, IconButton, Link, Paper, Stack, Tooltip, Typography } from "@mui/material";
-import { Add as AddIcon, Delete as DeleteIcon, Forum as ForumIcon } from "@mui/icons-material";
+import { Add as AddIcon, AssuredWorkload as AssuredWorkloadIcon, Delete as DeleteIcon, Forum as ForumIcon } from "@mui/icons-material";
 import SimpleLink from "../Common/SimpleLink";
 import { Section } from "../../Api/Contracts/Sections";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -11,8 +11,9 @@ import ConfirmDialog from "../Modals/ConfirmDialog";
 import snackbarService from "../../Services/SnackbarService";
 import { Guid } from "../../Common/Types";
 import BaseProgress from "../Common/BaseProgress";
+import SectionView from "../Common/SectionView";
 
-function Forum() {
+function ForumPage() {
   const [loading, setLoading] = useState(true);
   const [sections, setSections] = useState<Section[]>([]);
 
@@ -90,9 +91,18 @@ function Forum() {
             </Tooltip>
           }
         </Box>
-
         <Stack>
           {sections?.map(section => { return buildSection(section, hasDeleteSectionPermission)})}
+        </Stack>
+
+        <Box sx={{ mt: 2, display: 'inline-flex', alignItems: 'center' }}>
+          <Typography variant="h5" fontFamily="cursive">Административные разделы</Typography>
+        </Box>
+        <Stack>
+          <SectionView
+            title="Модераторы разделов"
+            description="В данном разделе можно проголосовать за модератора раздела либо выступить в качестве кандидата в модераторы раздела"
+            icon={AssuredWorkloadIcon} />
         </Stack>
       </Container>
 
@@ -107,4 +117,4 @@ function Forum() {
   )
 }
 
-export default observer(Forum);
+export default observer(ForumPage);

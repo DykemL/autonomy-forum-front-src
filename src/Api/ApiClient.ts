@@ -19,14 +19,18 @@ const REQUEST_FAILED: string = 'Failed to fetch';
 
 class ApiClient {
   private apiUrl: string;
-  private timeout: number = 10000;
+  private timeout: number = 12000;
 
   constructor() {
-    this.apiUrl = process.env.REACT_APP_API_URL!;
+    this.apiUrl = process.env.REACT_APP_API_URL! + "/api";
   }
 
   async post<TResultBody, TRequestBody>(path: string, body?: TRequestBody): Promise<RequestResult<TResultBody>> {
     return await this.send(`${this.apiUrl}/${path}`, 'post', body);
+  }
+
+  async postFormData<TResultBody>(path: string, body?: FormData): Promise<RequestResult<TResultBody>> {
+    return await this.sendFormData(`${this.apiUrl}/${path}`, 'post', body);
   }
 
   async get<TResultBody>(path: string, parameter?: string): Promise<RequestResult<TResultBody>> {
@@ -55,18 +59,26 @@ class ApiClient {
   }
 
   private async send<TResultBody, TRequestBody>(path: string, method: string, body?: TRequestBody): Promise<RequestResult<TResultBody>> {
+    const headers = { "Content-Type": "application/json" };
+    const bodySpecified = body && JSON.stringify(body);
+    return await this.sendBase(path, method, bodySpecified, headers);
+  }
+
+  private async sendFormData<TResultBody>(path: string, method: string, body?: FormData): Promise<RequestResult<TResultBody>> {
+    return await this.sendBase(path, method, body, undefined);
+  }
+
+  private async sendBase<TResultBody>(path: string, method: string, body?: any, headers?: HeadersInit): Promise<RequestResult<TResultBody>> {
     await userService.updateAuthorizationState();
     const controller = new AbortController();
     setTimeout(() => controller.abort(), this.timeout);
     const request = new Request(path, {
       method: method,
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: headers,
       signal: controller.signal,
       mode: 'cors',
       credentials: 'include',
-      body: body && JSON.stringify(body)
+      body: body
     });
 
     const result = await fetch(request).catch(error => {

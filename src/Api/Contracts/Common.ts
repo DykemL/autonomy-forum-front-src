@@ -13,6 +13,8 @@ export class UserInfo {
 
   @JsonProperty("Email")
   email?: string;
+
+  avatarFilePath?: string;
 }
 
 @JsonObject("UserExtended")
@@ -26,4 +28,6 @@ export class UserExtended {
   roles?: Role[];
 
   permissions?: Permission;
+
+  avatarFilePath?: string;
 }

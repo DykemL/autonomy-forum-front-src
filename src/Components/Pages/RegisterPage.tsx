@@ -8,11 +8,13 @@ import snackbarService from '../../Services/SnackbarService';
 import { useNavigate } from 'react-router-dom';
 import userService from '../../Services/UserService';
 
-function Register() {
-  const userName = useField('', { isEmpty: true });
-  const email = useField('', { isEmpty: true });
-  const password = useField('', { isEmpty: true });
-  const passwordRetype = useField('', { isEmpty: true, sameValue: password.value });
+function RegisterPage() {
+  const userName = useField('', { isNotEmpty: true });
+  const email = useField('', { isNotEmpty: true });
+  const password = useField('', { isNotEmpty: true });
+  const passwordRetype = useField('', { isNotEmpty: true, sameValue: password.value });
+
+  const [isUserNameAlreadyExists, setIsUserNameAlreadyExists] = useState(false);
 
   const [wasSubmitted, setWasSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -57,11 +59,21 @@ function Register() {
   };
 
   const validateForm = () : boolean => {
-    if (userName.validation.hasErrors || email.validation.hasErrors || password.validation.hasErrors || passwordRetype.validation.hasErrors) {
+    if (userName.validation.hasErrors || email.validation.hasErrors || password.validation.hasErrors || passwordRetype.validation.hasErrors || isUserNameAlreadyExists) {
       return false;
     }
 
     return true;
+  }
+
+  const checkUserNameAlreadyExists = async () => {
+    const result = await Api.users.isUserNameExists(userName.value!);
+    if (result.body == true) {
+      setIsUserNameAlreadyExists(true);
+      return;
+    }
+
+    setIsUserNameAlreadyExists(false);
   }
 
   return (
@@ -70,10 +82,14 @@ function Register() {
         <Typography component="h1" variant="h5">Регистрация</Typography>
         <Box component="form" noValidate onSubmit={onSubmit} sx={{ mt: 3, width: '100%' }}>
           <Stack sx={{ width: '100%' }} spacing={2}>
+            {isUserNameAlreadyExists && <Alert severity="error">Такое имя пользователя уже существует</Alert>}
             <TextField id="userName" name="userName" label="Логин"
               onChange={userName.onChange}
-              onBlur={() => userName.startValidation()}
-              error={userName.validation.hasErrors}
+              onBlur={() => {
+                userName.startValidation();
+                checkUserNameAlreadyExists();
+              }}
+              error={userName.validation.hasErrors || isUserNameAlreadyExists}
               required fullWidth />
             <TextField id="email" name="email" label="Email"
               onChange={email.onChange}
@@ -101,4 +117,4 @@ function Register() {
   );
 }
 
-export default observer(Register);
+export default observer(RegisterPage);

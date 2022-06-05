@@ -1,11 +1,12 @@
-import { Delete as DeleteIcon, Favorite as FavoriteIcon, Person, Send } from "@mui/icons-material";
-import { Badge, Box, Button, Container, Divider, Fab, Grid, Paper, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import { Delete as DeleteIcon, ThumbUp as ThumbIcon, Person, Send } from "@mui/icons-material";
+import { Avatar, Badge, Box, Button, Container, Divider, Fab, Grid, Paper, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import { observer } from "mobx-react-lite";
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import Api from "../../Api/Api";
 import { Reply } from "../../Api/Contracts/Replies";
 import { Topic } from "../../Api/Contracts/Topics";
+import { getFilePath } from "../../Common/Helpers/WebFilesHelper";
 import { Guid, Nullable } from "../../Common/Types";
 import { useField } from "../../Hooks/useField";
 import snackbarService from "../../Services/SnackbarService";
@@ -104,12 +105,13 @@ function TopicPage() {
   const buildReply = (reply: Reply, index: number): any => {
     const creationDate = new Date(reply.creationDateTime!);
     const canLike = currentUserId !== undefined && !reply?.favoredBy?.includes(currentUserId!) && reply.author?.id != currentUserId;
+    const avatarWebPath = getFilePath(reply.author?.avatarFilePath);
     return (
       <Paper key={index} sx={{ mt: 2, p: 1 }} variant="outlined" elevation={2}>
         <Grid columns={14} container direction="row" columnSpacing={1}>
           <Grid item xs={2}>
             <Box sx={{ display: 'inline-flex', alignItems: 'center', flexWrap: 'wrap' }}>
-              <Person sx={{ mr: 1 }} />
+            <Avatar src={avatarWebPath} sx={{ width: 36, height: 36, mr: 1 }}></Avatar>
               <SimpleLink to={"/users/" + reply?.author?.id}>
                 {reply?.author?.userName}
               </SimpleLink>
@@ -131,8 +133,8 @@ function TopicPage() {
                 }
               });
             }} disabled={!canLike} size="small" color="default">
-              <Badge color="secondary" badgeContent={reply?.favoredBy?.length ?? 0} showZero>
-                <FavoriteIcon color="error" />
+              <Badge anchorOrigin={{ vertical: 'top', horizontal: 'left' }} color="secondary" badgeContent={reply?.favoredBy?.length ?? 0} showZero>
+                <ThumbIcon color="success" />
               </Badge>
             </Fab>
 
@@ -159,6 +161,7 @@ function TopicPage() {
   if (!loading && filter.value !== undefined && filter.value !== '') {
     replies = topic?.replies?.filter(reply => reply!.message!.indexOf(filter.value!) !== -1)
   }
+  const avatarWebPath = getFilePath(topic?.author?.avatarFilePath);
   return (!loading ?
     <Container sx={{ mt: 2 }}>
       <Typography variant="h5" fontFamily="cursive">{topic?.title}</Typography>
@@ -167,7 +170,7 @@ function TopicPage() {
         <Grid columns={14} container direction="row" columnSpacing={1}>
           <Grid item xs={2}>
             <Box sx={{ display: 'inline-flex', alignItems: 'center', flexWrap: 'wrap' }}>
-              <Person sx={{ mr: 1 }} />
+              <Avatar src={avatarWebPath} sx={{ width: 36, height: 36, mr: 1 }}></Avatar>
               <SimpleLink to={"/users/" + topic?.author?.id}>
                 {topic?.author?.userName}
               </SimpleLink>

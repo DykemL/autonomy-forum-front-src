@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Nullable } from "../Common/Types";
 
 export interface ValidationRules {
-  isEmpty?: boolean;
+  isNotEmpty?: boolean;
   sameValue?: string;
 }
 
@@ -18,7 +18,7 @@ export function useValidation(value: Nullable<string>, rules: ValidationRules, i
   const [isSameValue, setIsSameValue] = useState(true);
 
   const validate = () => {
-    if (rules.isEmpty) {
+    if (rules.isNotEmpty) {
       value == undefined || value === '' ? setIsEmpty(true) : setIsEmpty(false);
     }
     if (rules.sameValue != undefined) {

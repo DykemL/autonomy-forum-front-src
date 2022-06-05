@@ -1,4 +1,5 @@
 import AuthApi from "./AuthApi";
+import FilesApi from "./FilesApi";
 import RepliesApi from "./RepliesApi";
 import SectionsApi from "./SectionsApi";
 import TopicsApi from "./TopicsApi";
@@ -12,6 +13,7 @@ class Api {
   static topics: TopicsApi = new TopicsApi();
   static replies: RepliesApi = new RepliesApi();
   static users: UsersApi = new UsersApi();
+  static files: FilesApi = new FilesApi();
 }
 
 export default Api;
