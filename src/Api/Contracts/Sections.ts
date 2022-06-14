@@ -1,5 +1,6 @@
 import { JsonObject, JsonProperty } from "json2typescript";
 import { Guid } from "../../Common/Types";
+import { UserInfo } from "./Common";
 import { Topic } from "./Topics";
 
 export enum SectionType {
@@ -23,6 +24,8 @@ export class Section {
 
   @JsonProperty("Topics")
   topics?: Topic[] 
+
+  prefect?: UserInfo;
 }
 
 export interface CreateSectionRequest {

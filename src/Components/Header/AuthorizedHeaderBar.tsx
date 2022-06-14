@@ -37,7 +37,15 @@ function AuthorizedHeaderBar () {
         <MenuItem onClick={() => {
           closeProfileMenu();
           navigate('/users/' + userService.getUserId());
-        }}>Профиль</MenuItem>
+        }}>
+          Профиль
+        </MenuItem>
+        <MenuItem onClick={() => {
+          closeProfileMenu();
+          navigate('/messages');
+        }}>
+          Диалоги
+        </MenuItem>
         <MenuItem onClick={() => {
             closeProfileMenu();
             userService.logout();

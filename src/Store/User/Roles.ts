@@ -4,27 +4,27 @@ export type Role =
 'User' |
 'Admin' |
 'Moderator' |
+'Prefect' |
 'Banned'
 
 export const localizeRole = (role: Role): Nullable<string> => {
   let localizedRole: string | undefined = undefined;
   switch (role) {
-    case 'Admin': {
+    case 'Admin':
       localizedRole = 'Администратор';
       break;
-    };
-    case 'User': {
+    case 'User':
       localizedRole = 'Пользователь';
       break;
-    };
-    case 'Moderator': {
+    case 'Moderator':
       localizedRole = 'Модератор';
       break;
-    }
-    case 'Banned': {
+    case 'Prefect':
+      localizedRole = 'Префект';
+      break;
+    case 'Banned':
       localizedRole = 'Заблокированный';
       break;
-    };
   };
   return localizedRole;
 }

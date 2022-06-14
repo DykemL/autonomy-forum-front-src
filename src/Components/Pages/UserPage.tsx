@@ -11,6 +11,7 @@ import userService from "../../Services/UserService";
 import { localizeRole, Role } from "../../Store/User/Roles";
 import BaseProgress from "../Common/BaseProgress";
 import ImageSelector from "../Common/ImageSelector";
+import SimpleLink from "../Common/SimpleLink";
 
 function UserPage() {
   const [loading, setLoading] = useState(true);
@@ -101,12 +102,27 @@ function UserPage() {
           <Typography variant="subtitle1">{user?.email}</Typography>
         </Box>
         <Box>
+          <Typography variant="caption">Ответы:</Typography>
+          <Typography variant="subtitle1">{user?.repliesCount}</Typography>
+        </Box>
+        <Box>
+          <Typography variant="caption">Рейтинг:</Typography>
+          <Typography variant="subtitle1">{user?.rating}</Typography>
+        </Box>
+        <Box>
           <Typography variant="caption">Роли:</Typography>
           {hasUserRoles ? user!.roles!.map(x => createRoleLine(x)) : createRoleLine('Нет ролей')}
         </Box>
       </Stack>
       {!isMyProfile &&
         <Box sx={{ display: 'flex', flexDirection: 'column', maxWidth: 'fit-content' }}>
+          {currentUserId !== undefined &&
+            <Box sx={{ mt: 2 }}>
+              <SimpleLink component={"div"} variant="body2" to={"/messages/" + userId}>
+                Перейти к диалогу
+              </SimpleLink>
+            </Box>
+          }
           {canBan && !alreadyBanned &&
             <Button size="small" color="error" onClick={() => addRole(user?.id!, 'Banned')} variant="contained" sx={{ mt: 2 }} startIcon={<Block />}>
               Заблокировать

@@ -12,6 +12,7 @@ import snackbarService from "../../Services/SnackbarService";
 import { Guid } from "../../Common/Types";
 import BaseProgress from "../Common/BaseProgress";
 import SectionView from "../Common/SectionView";
+import CurrentPrefectView from "./CurrentPrefectView";
 
 function ForumPage() {
   const [loading, setLoading] = useState(true);
@@ -59,6 +60,7 @@ function ForumPage() {
             <Typography>{section.description}</Typography>
           </Grid>
           <Grid item xs>
+            <CurrentPrefectView prefect={section?.prefect} />
           </Grid>
           {hasDeleteSectionPermission &&
             <Grid item sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end' }} xs={1}>
@@ -100,8 +102,9 @@ function ForumPage() {
         </Box>
         <Stack>
           <SectionView
-            title="Модераторы разделов"
-            description="В данном разделе можно проголосовать за модератора раздела либо выступить в качестве кандидата в модераторы раздела"
+            title="Префектура"
+            to="prefecture"
+            description="В данном разделе можно проголосовать за префекта раздела либо зарегистрироваться в качестве кандидата в префекты раздела"
             icon={AssuredWorkloadIcon} />
         </Stack>
       </Container>

@@ -15,5 +15,5 @@ export function setLogout(isLogoutValue: boolean): void {
 
 export function isLogout(): boolean {
   let state = getCookie(IS_LOGOUT);
-  return state == 'true' || state === undefined;
+  return state == 'true';
 }

@@ -1,4 +1,4 @@
-import { Add as AddIcon, Delete, ExpandLess, ExpandMore, Feed as FeedIcon, Person, Search } from "@mui/icons-material";
+import { Add as AddIcon, Delete, ExpandLess, ExpandMore, Feed as FeedIcon, LocalPolice, Person, Search } from "@mui/icons-material";
 import { Avatar, Box, CircularProgress, Container, Divider, Fab, Grid, InputAdornment, Paper, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
@@ -16,6 +16,7 @@ import SearchField from "../Common/SearchField";
 import SimpleLink from "../Common/SimpleLink";
 import ConfirmDialog from "../Modals/ConfirmDialog";
 import CreateTopicDialog from "../Modals/CreateTopicDialog";
+import CurrentPrefectView from "./CurrentPrefectView";
 
 function SectionPage() {
   const [loading, setLoading] = useState(true);
@@ -25,6 +26,7 @@ function SectionPage() {
   const [isCreateDialog, setIsCreateDialog] = useState(false);
 
   const filter = useField(undefined);
+  const isAuthorized = userService.isAuthorized();
 
   useEffect(() => {
     if (section !== undefined) {
@@ -62,7 +64,7 @@ function SectionPage() {
     setLoading(false);
   }
 
-  const hasDeleteTopicPermission = userService.checkPermission('delete-topic');
+  const hasDeleteTopicPermission = userService.checkPermission('delete-topic', section?.prefect?.id);
   const buildTopic = (topic: Topic): any => {
     const creationDate = new Date(topic.creationDateTime!);
     const avatarWebPath = getFilePath(topic.author?.avatarFilePath);
@@ -70,7 +72,7 @@ function SectionPage() {
       <Paper sx={{ mt: 2, p: 1 }} elevation={2}>
         <Grid columns={14} container direction="row" columnSpacing={1}>
           <Grid item xs={2} sx={{ display: 'inline-flex', alignItems: 'center', flexWrap: 'wrap' }}>
-          <Avatar src={avatarWebPath} sx={{ width: 32, height: 32, mr: 1 }}></Avatar>
+            <Avatar src={avatarWebPath} sx={{ width: 32, height: 32, mr: 1 }}></Avatar>
             <SimpleLink to={"/users/" + topic?.author?.id}>
               {topic.author?.userName}
             </SimpleLink>
@@ -108,12 +110,18 @@ function SectionPage() {
       <Container sx={{ mt: 2 }}>
         <Box sx={{ display: 'inline-flex', alignItems: 'center' }}>
           <Typography variant="h5" fontFamily="cursive">{section?.title}</Typography>
-          <Tooltip title='Создать тему'>
-            <Fab onClick={() => setIsCreateDialog(true)} sx={{ ml: 2 }} color="secondary" size="small">
-              <AddIcon />
-            </Fab>
-          </Tooltip>
+          {isAuthorized &&
+            <Tooltip title='Создать тему'>
+              <Fab onClick={() => setIsCreateDialog(true)} sx={{ ml: 2 }} color="secondary" size="small">
+                <AddIcon />
+              </Fab>
+            </Tooltip>
+          }
         </Box>
+
+        <Box sx={{ mt: 1 }}>
+          <CurrentPrefectView prefect={section?.prefect} />
+        </Box>        
 
         <Box>
           <SearchField value={filter?.value} onChange={filter?.onChange} />
