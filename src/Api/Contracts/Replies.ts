@@ -21,6 +21,9 @@ export class Reply {
   @JsonProperty("FavoredBy")
   favoredBy?: Guid[];
 
+  @JsonProperty("FavoredBy")
+  favoredUsersBy?: UserInfo[];
+
   @JsonProperty("CreationDateTime")
   creationDateTime?: Date;
 }

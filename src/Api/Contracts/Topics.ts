@@ -20,6 +20,8 @@ export class Topic {
   @JsonProperty("Replies")
   replies?: Reply[];
 
+  prefectId?: Guid;
+
   @JsonProperty("CreationDateTime")
   creationDateTime?: string;
 }

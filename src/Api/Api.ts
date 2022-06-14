@@ -1,5 +1,7 @@
 import AuthApi from "./AuthApi";
+import ElectionsApi from "./ElectionsApi";
 import FilesApi from "./FilesApi";
+import PrivateMessagesApi from "./PrivateMessagesApi";
 import RepliesApi from "./RepliesApi";
 import SectionsApi from "./SectionsApi";
 import TopicsApi from "./TopicsApi";
@@ -14,6 +16,8 @@ class Api {
   static replies: RepliesApi = new RepliesApi();
   static users: UsersApi = new UsersApi();
   static files: FilesApi = new FilesApi();
+  static elections: ElectionsApi = new ElectionsApi();
+  static messages: PrivateMessagesApi = new PrivateMessagesApi();
 }
 
 export default Api;

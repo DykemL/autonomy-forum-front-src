@@ -5,6 +5,7 @@ import SimpleLink from "./SimpleLink";
 interface SectionViewProps {
   title: string;
   description: string;
+  to: string;
   icon: any
 }
 
@@ -14,7 +15,7 @@ function SectionView(props: SectionViewProps) {
       <AssuredWorkloadIcon color="info" sx={{ mr: 1 }} />
       <Grid container direction="row" columnSpacing={1}>
         <Grid item xs={8}>
-          <SimpleLink to={"/"}>{props.title}</SimpleLink>
+          <SimpleLink to={props.to}>{props.title}</SimpleLink>
           <Typography>{props.description}</Typography>
         </Grid>
         <Grid item xs>

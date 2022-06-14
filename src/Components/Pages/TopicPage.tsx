@@ -1,5 +1,5 @@
-import { Delete as DeleteIcon, ThumbUp as ThumbIcon, Person, Send } from "@mui/icons-material";
-import { Avatar, Badge, Box, Button, Container, Divider, Fab, Grid, Paper, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import { Delete as DeleteIcon, Person, Send } from "@mui/icons-material";
+import { Avatar, Badge, Box, Button, Container, Divider, Fab, Grid, Paper, Popover, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -12,6 +12,7 @@ import { useField } from "../../Hooks/useField";
 import snackbarService from "../../Services/SnackbarService";
 import userService from "../../Services/UserService";
 import BaseProgress from "../Common/BaseProgress";
+import LikeView from "../Common/LikeView";
 import SearchField from "../Common/SearchField";
 import SimpleLink from "../Common/SimpleLink";
 import ConfirmDialog from "../Modals/ConfirmDialog";
@@ -29,8 +30,6 @@ function TopicPage() {
   const [isDeleteReplyOpen, setIsDeleteReplyOpen] = useState(false);
   const [isDeleteReply, setIsDeleteReply] = useState(false);
   const currentReplyId = useRef<Nullable<Guid>>();
-
-  const currentUserId = userService.getUserId();
 
   useEffect(() => {
     if (topic !== undefined) {
@@ -87,25 +86,11 @@ function TopicPage() {
     setTopic(undefined);
   }, [isDeleteReply]);
 
-  const [isDoLikeReply, setIsDoLikeReply] = useState(false);
-  const doLikeReply = async (replyId: Guid): Promise<boolean> => {
-    if (isDoLikeReply) {
-      return false;
-    }
-    setIsDoLikeReply(true);
-    const result = await Api.replies.doLikeReply(replyId);
-    if (!result.ensureSuccess()) {
-      snackbarService.push('Не удалось оценить ответ', 'error');
-    }
-    setIsDoLikeReply(false);
-    return true;
-  }
-
-  const hasDeleteReplyPermission = userService.checkPermission('delete-reply');
+  const hasDeleteReplyPermission = userService.checkPermission('delete-reply', topic?.prefectId);
   const buildReply = (reply: Reply, index: number): any => {
     const creationDate = new Date(reply.creationDateTime!);
-    const canLike = currentUserId !== undefined && !reply?.favoredBy?.includes(currentUserId!) && reply.author?.id != currentUserId;
     const avatarWebPath = getFilePath(reply.author?.avatarFilePath);
+
     return (
       <Paper key={index} sx={{ mt: 2, p: 1 }} variant="outlined" elevation={2}>
         <Grid columns={14} container direction="row" columnSpacing={1}>
@@ -120,24 +105,11 @@ function TopicPage() {
           <Grid item xs zeroMinWidth sx={{ overflowWrap: 'break-word' }}>
             <Typography >{reply?.message}</Typography>
           </Grid>
+          <Grid item xs={1} sx={{ display: "flex", flexDirection: "row-reverse" }}>
+            <LikeView reply={reply} topic={topic} setTopic={setTopic} />
+          </Grid>
           <Grid item xs={1}>
             <Typography variant="caption">{creationDate.toLocaleString()}</Typography>
-
-            <Fab onClick={() => {
-              doLikeReply(reply.id!).then(wasLiked => {
-                if (wasLiked && reply && reply.favoredBy && currentUserId) {
-                  let newReplyIndex = topic!.replies!.map(x => x.id).indexOf(reply!.id);
-                  let favoredBy = topic!.replies![newReplyIndex].favoredBy;
-                  topic!.replies![newReplyIndex].favoredBy = [...favoredBy!, currentUserId];
-                  setTopic(topic);
-                }
-              });
-            }} disabled={!canLike} size="small" color="default">
-              <Badge anchorOrigin={{ vertical: 'top', horizontal: 'left' }} color="secondary" badgeContent={reply?.favoredBy?.length ?? 0} showZero>
-                <ThumbIcon color="success" />
-              </Badge>
-            </Fab>
-
           </Grid>
           {hasDeleteReplyPermission &&
             <Grid item sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end' }} xs="auto">
@@ -165,7 +137,7 @@ function TopicPage() {
   return (!loading ?
     <Container sx={{ mt: 2 }}>
       <Typography variant="h5" fontFamily="cursive">{topic?.title}</Typography>
-      
+
       <Paper sx={{ mt: 2, p: 1 }} variant="outlined" elevation={2}>
         <Grid columns={14} container direction="row" columnSpacing={1}>
           <Grid item xs={2}>

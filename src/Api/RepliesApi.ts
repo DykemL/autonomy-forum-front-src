@@ -18,4 +18,8 @@ export default class RepliesApi {
   async doLikeReply(replyId: Guid): Promise<RequestResult> {
     return await ApiClient.post('replies/'+ replyId +'/like');
   }
+
+  async cancelLikeReply(replyId: Guid): Promise<RequestResult> {
+    return await ApiClient.post('replies/'+ replyId +'/cancel-like');
+  }
 }

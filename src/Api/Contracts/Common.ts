@@ -27,7 +27,11 @@ export class UserExtended {
 
   roles?: Role[];
 
-  permissions?: Permission;
+  permissions?: Permission[];
+
+  repliesCount?: number;
+
+  rating?: number;
 
   avatarFilePath?: string;
 }

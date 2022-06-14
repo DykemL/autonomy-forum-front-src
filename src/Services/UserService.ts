@@ -4,6 +4,7 @@ import userStore from "../Store/User/UserStore";
 import Api from '../Api/Api';
 import { Guid, Nullable } from '../Common/Types';
 import { isLogout, setLogout } from '../Common/Helpers/JwtHelper';
+import { Section } from '../Api/Contracts/Sections';
 
 class UserService {
   login(user?: UserExtended) {
@@ -22,7 +23,6 @@ class UserService {
       const result = await Api.auth.refresh();
       if (!result.ensureSuccess()) {
         //snackbarService.push('Произошла ошибка авторизации', 'error')
-        this.logout();
         userStore.isUpdateInProgress = false;
         return;
       }
@@ -35,7 +35,18 @@ class UserService {
     userStore.isUpdateInProgress = false;
   }
 
-  checkPermission(permission: Permission): boolean {
+  checkPermission(permission: Permission, prefectId: Nullable<Guid> = undefined): boolean {
+    if (prefectId != undefined) {
+      const currentPermissions = userStore?.user?.permissions;
+      const conditionalPermission = currentPermissions?.indexOf(("c:" + permission) as Permission);
+      if (conditionalPermission === undefined) {
+        return false;
+      }
+      if (userStore.user?.id == prefectId) {
+        return true;
+      }
+    }
+
     if (userStore.user == undefined || userStore.user.permissions == undefined) {
       return false;
     }
